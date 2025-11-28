@@ -76,15 +76,11 @@ def main():
     st.title("BT Payment Triage")
     st.write("Reading from Google Sheets (All_flagged_sessions) to find why a BT was not paid.")
 
-    st.caption(
-        "Set a public or authorized CSV export URL for the Google Sheet in Streamlit secrets as GSHEET_CSV_URL."
-    )
-
     default_sheet_url = st.secrets.get("GSHEET_CSV_URL", "")
     sheet_url = default_sheet_url
 
     if not sheet_url:
-        st.error("Please provide a Google Sheets CSV export URL (set GSHEET_CSV_URL in secrets or paste above).")
+        st.error("Data source not configured. Ask an admin to set GSHEET_CSV_URL in secrets.")
         st.stop()
 
     @st.cache_data(ttl=60)
