@@ -74,14 +74,33 @@ def is_unverified(row: pd.Series) -> bool:
 
 def main():
     st.title("BT Payment Triage")
-    st.write("Upload the All_flagged_sessions Excel, then filter/search to find why a BT was not paid.")
+    st.write("Reading from Google Sheets (All_flagged_sessions) to find why a BT was not paid.")
 
-    upload = st.file_uploader("Upload Excel file", type=["xls", "xlsx"])
-    if not upload:
+    st.caption(
+        "Set a public or authorized CSV export URL for the Google Sheet in Streamlit secrets as GSHEET_CSV_URL. "
+        "Optionally paste a URL below for testing."
+    )
+
+    default_sheet_url = st.secrets.get("GSHEET_CSV_URL", "")
+    sheet_url = st.text_input("Google Sheet CSV export URL", value=default_sheet_url, placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv")
+
+    if not sheet_url:
+        st.error("Please provide a Google Sheets CSV export URL (set GSHEET_CSV_URL in secrets or paste above).")
         st.stop()
 
-    # Read Excel
-    df_raw = pd.read_excel(upload)
+    @st.cache_data(ttl=60)
+    def load_data(url: str) -> pd.DataFrame:
+        return pd.read_csv(url)
+
+    if st.button("Refresh data now"):
+        load_data.clear()
+
+    try:
+        df_raw = load_data(sheet_url)
+    except Exception as e:
+        st.error(f"Failed to load Google Sheet: {e}")
+        st.stop()
+
     df, rename_map = normalize_columns(df_raw)
 
     # Parse dates if present
