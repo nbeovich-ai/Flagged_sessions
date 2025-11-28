@@ -77,12 +77,11 @@ def main():
     st.write("Reading from Google Sheets (All_flagged_sessions) to find why a BT was not paid.")
 
     st.caption(
-        "Set a public or authorized CSV export URL for the Google Sheet in Streamlit secrets as GSHEET_CSV_URL. "
-        "Optionally paste a URL below for testing."
+        "Set a public or authorized CSV export URL for the Google Sheet in Streamlit secrets as GSHEET_CSV_URL."
     )
 
     default_sheet_url = st.secrets.get("GSHEET_CSV_URL", "")
-    sheet_url = st.text_input("Google Sheet CSV export URL", value=default_sheet_url, placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv")
+    sheet_url = default_sheet_url
 
     if not sheet_url:
         st.error("Please provide a Google Sheets CSV export URL (set GSHEET_CSV_URL in secrets or paste above).")
